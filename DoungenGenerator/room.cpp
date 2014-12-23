@@ -4,6 +4,11 @@
 namespace doungen {
 	bool isConnector(Room* room, Map& map, int i, int j);
 
+	int min(int a, int b) {
+		if (a < b) return a;
+		return b;
+	}
+
 	Room::Room(int xPos, int yPos, int w, int h) : x(xPos), y(yPos), width(w), height(h) {
 		applyTiles();
     }
@@ -32,7 +37,17 @@ namespace doungen {
 				connectors.push_back(tile);
 			}
 		}
-		
+
+		if (connectors.size() > 0) {
+			std::uniform_int_distribution<int> amountDistribution(1, min(4, connectors.size()));
+			int amount = amountDistribution(map.generator);
+			for (int i = amount; i > 0; --i) {
+				std::uniform_int_distribution<int> indexDistribution(0, connectors.size() - 1);
+				tiles.push_back(connectors[i]);
+				connectors.erase(connectors.begin() + i);
+			}
+		}
+
 		return connectors;
 	}
 

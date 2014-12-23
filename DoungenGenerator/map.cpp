@@ -1,18 +1,19 @@
 #include "doungen.hpp"
 #include <random>
 #include <iostream>
+#include <time.h>
 
 namespace doungen {
 	
 
-	std::shared_ptr<Region> Map::getRegion(Tile tile) {
-		for(std::vector<std::shared_ptr<Region>>::iterator it = regions.begin(); it != regions.end(); ++it) {
-			std::vector<Tile> tiles = it->get()->tiles;
-			if (std::find(tiles.begin(), tiles.end(), tile) != tiles.end()) {
-				return *it;
-			}
+	std::shared_ptr<Region> Map::getRegion(int x, int y) {
+		if (!isInside(x, y)) {
+			return std::shared_ptr<Region>(nullptr);
 		}
-		return std::shared_ptr<Region>(nullptr);
+
+		auto region = tileMap[x][y];
+
+		return region;
 	}
 
 	void Map::generateRooms(int attempts) {
@@ -42,21 +43,49 @@ namespace doungen {
 					break;
 				}
 			}
-			if (getRegion(room->x, room->y + room->height) || getRegion(room->x + room->width, room->y) ||
+			/*if (getRegion(room->x, room->y + room->height) || getRegion(room->x + room->width, room->y) ||
 				getRegion(room->x + room->width, room->y + room->height) || getRegion(room->x, room->y)) {
 					continue;
-			}
+			}*/
 			if (!intersects) {
 				//room->shrink(1, 1);
 				regions.push_back(room);
 			}
 		}
+	
+		update();
 	}
 
 	void Map::generateCorridor(int startX, int startY) {
 		auto corridor = std::make_shared<Corridor>(startX, startY);
 		regions.push_back(corridor);
 		corridor->generate(*this);
+		update();
+	}
+
+	void Map::shrinkCorridors(float accuracy) {
+		for (auto region : regions) {
+			auto corridor = std::dynamic_pointer_cast<Corridor>(region);
+			if (corridor) {
+				corridor->shrink(accuracy, *this);
+				update();
+			}
+		}
+	}
+
+	void Map::update() {
+		for (int i = 0; i < width; i++) {
+			for (int j = 0; j < height; j++) {
+				tileMap[i][j] = std::shared_ptr<Region>(nullptr);
+			}
+		}
+		for (auto region : regions) {
+			for (auto tile : region->tiles) {
+				if (isInside(tile)) {
+					tileMap[tile.x][tile.y] = region;
+				}
+			}
+		}
 	}
 	
 	bool Map::isInside(int x, int y) const {

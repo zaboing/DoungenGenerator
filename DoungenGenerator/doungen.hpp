@@ -47,31 +47,37 @@ namespace doungen {
 	public:
 		Corridor(Tile start);
 		Corridor(int startX, int startY);
-		std::vector<Tile> connectors(Map& map) {
-			return std::vector<Tile>();
-		}
+		std::vector<Tile> connectors(Map& map);
 		void generate(Map& map);
+		void shrink(float accuracy, Map& map);
     };
 
 	class Map {
 		int width, height;
 	public:
+		std::shared_ptr<Region>** tileMap;
 		std::default_random_engine generator;
 		std::vector<std::shared_ptr<Region>> regions;
 		Map(int w, int h) : width(w), height(h) {
 			generator.seed(112);
+			tileMap = new std::shared_ptr<Region>*[width];
+			for (int i = 0; i < width; i++) {
+				tileMap[i]= new std::shared_ptr<Region>[height];
+			}
 		}
+		~Map() { delete[] tileMap; }
 		int getWidth() const { return width; }
 		int getHeight() const { return height; }
-		std::shared_ptr<Region> getRegion(Tile position);
-		std::shared_ptr<Region> getRegion(int x, int y) {
-			Tile tile(x, y);
-			return getRegion(tile);
+		std::shared_ptr<Region> getRegion(Tile position) {
+			return getRegion(position.x, position.y);
 		}
+		std::shared_ptr<Region> getRegion(int x, int y);
 		bool isInside(int x, int y) const;
 		bool isInside(Tile tile) const;
 		void generateRooms(int attempts);
 		void generateCorridor(int startX, int startY);
+		void shrinkCorridors(float accuracy);
+		void update();
 	};
 }
 
