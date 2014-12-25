@@ -58,10 +58,10 @@ namespace doungen {
 		int y = bounds->y;
 		int width = bounds->width;
 		int height = bounds->height;
-		return room->x >= x && room->y >= y && room->x < x + width && room->y < y + height
-				|| room->x + room->width >= x && room->y >= y && room->x + room->width < x + width && room->y < y + height
-				|| room->x + room->width >= x && room->y + room->height >= y && room->x + room->width < x + width && room->y + room->height < y + height
-				|| room->x >= x && room->y + room->height >= y && room->x < x + width && room->y + room->height < y + height;
+		return room->x >= x && room->y >= y && room->x <= x + width && room->y <= y + height
+				|| room->x + room->width >= x && room->y >= y && room->x + room->width <= x + width && room->y <= y + height
+				|| room->x + room->width >= x && room->y + room->height >= y && room->x + room->width <= x + width && room->y + room->height <= y + height
+				|| room->x >= x && room->y + room->height >= y && room->x <= x + width && room->y + room->height <= y + height;
 	}
 
 	bool Room::intersects(std::shared_ptr<Region> region) {

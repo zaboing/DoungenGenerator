@@ -21,6 +21,7 @@ namespace doungen {
 		std::uniform_int_distribution<int> yDistribution(0, this->height - 1);
 		std::uniform_int_distribution<int> widthDistribution(3, 15);
 		std::uniform_int_distribution<int> heightDistribution(3, 15);
+		char id = 'A';
 		for (int i = 0; i < attempts; i++) {
 			bool intersects = false;
 			std::shared_ptr<Room> room = std::make_shared<Room>(xDistribution(generator), yDistribution(generator), widthDistribution(generator), heightDistribution(generator));
@@ -36,7 +37,10 @@ namespace doungen {
 			if (room->height % 2 == 0) {
 				room->height += 1;
 			}
-			//std::cout << room->x << "." << room->y << " " << room->width << "x" << room->height << std::endl;
+			if (!isInside(room->x, room->y) || !isInside(room->x + room->width, room->y + room->height)
+				|| !isInside(room->x + room->width, room->y) ||!isInside(room->x, room->y + room->height)) {
+					continue;
+			}
 			room->applyTiles();
 			for (auto region : regions) {
 				if (room->intersects(region)) {
@@ -45,6 +49,8 @@ namespace doungen {
 				}
 			}
 			if (!intersects) {
+				room->id = id++;
+				std::cout << room->id << ":" << room->x << "." << room->y << " " << room->width << "x" << room->height << std::endl;
 				//room->shrink(1, 1);
 				regions.push_back(room);
 				set(room->tiles, room);
