@@ -1,21 +1,26 @@
 #include "doungen.hpp"
 #include <iostream>
+#include <time.h>
 
 void print(doungen::Map& map);
 
 int main(int argc, const char* argv[]) {
-	doungen::Map map(75, 70);
+	doungen::Map map(75, 75);
+	map.generator.seed(clock());
+
 	map.generateRooms(90);
-	/*
+	
 	map.generateCorridor(1, 1);
+
 	for (auto region : map.regions) {
 		std::shared_ptr<doungen::Room> room = std::dynamic_pointer_cast<doungen::Room>(region);
 		if (room) {
 			room->connectors(map);
 		}
 	}
-	map.shrinkCorridors(.4f);
-	*/
+
+	map.shrinkCorridors(0);
+	
 
 	print(map);
 
@@ -28,7 +33,7 @@ void print(doungen::Map& map) {
 		for (int i = 0; i < map.getWidth(); i++) {
 			std::shared_ptr<doungen::Region> region = map.getRegion(i, j);
 			if (region) {
-				std::cout << region->id;
+				std::cout << " ";
 			} else {
 				std::cout << "x";
 			}

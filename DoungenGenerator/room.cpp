@@ -53,21 +53,13 @@ namespace doungen {
 		return connectors;
 	}
 
-	bool isInside(Room* room, Room* bounds) {
-		int x = bounds->x;
-		int y = bounds->y;
-		int width = bounds->width;
-		int height = bounds->height;
-		return room->x >= x && room->y >= y && room->x <= x + width && room->y <= y + height
-				|| room->x + room->width >= x && room->y >= y && room->x + room->width <= x + width && room->y <= y + height
-				|| room->x + room->width >= x && room->y + room->height >= y && room->x + room->width <= x + width && room->y + room->height <= y + height
-				|| room->x >= x && room->y + room->height >= y && room->x <= x + width && room->y + room->height <= y + height;
-	}
-
 	bool Room::intersects(std::shared_ptr<Region> region) {
 		std::shared_ptr<Room> room = std::dynamic_pointer_cast<Room>(region);
 		if (room) {
-			return isInside(room.get(), this) || isInside(this, room.get());
+			return !(room->x > this->x + this->width || 
+           room->x + room->width < this->x || 
+           room->y > this->y + this->height ||
+           room->y + room->height < this->y);
 		} else {
 			return false;
 		}

@@ -1,7 +1,6 @@
 #include "doungen.hpp"
 
 #include <iostream>
-#include <time.h>
 
 namespace doungen {
 
@@ -30,22 +29,15 @@ namespace doungen {
 				candidates.push_back(tile);
 			}
 		}
-		time_t timer;
-		struct tm y2k;
-		double seconds;
 
-		y2k.tm_hour = 0;   y2k.tm_min = 0; y2k.tm_sec = 0;
-		y2k.tm_year = 100; y2k.tm_mon = 0; y2k.tm_mday = 1;
-		
-		time(&timer);  /* get current time; same as: timer = time(NULL)  */
-
-		seconds = difftime(timer,mktime(&y2k));
+		auto time = clock();
 
 		generate(map, candidates);
 
-		time(&timer);  /* get current time; same as: timer = time(NULL)  */
+		time = clock() - time;
 
-		std::cout << "Generated corridors in " << (difftime(timer,mktime(&y2k)) - seconds) << " seconds." << std::endl;
+
+		std::cout << "Generated corridors in " << (((float)time)/CLOCKS_PER_SEC) << " seconds." << std::endl;
 	}
 
 	void Corridor::generate(Map& map, std::vector<Tile>& candidates) {
@@ -149,12 +141,15 @@ election:
 
 	void Corridor::shrink(float accuracy, Map& map) {
 		int min = (int)(tiles.size() * accuracy);
+		std::vector<Tile> candidates(tiles);
 		while (tiles.size() > min) {
 			bool found = false;
-			for (auto it = tiles.begin(); it != tiles.end();) {
+			for (auto it = candidates.begin(); it != candidates.end();) {
 				if (isDeadEnd(*it, map)) {
 					found = true;
-					it = tiles.erase(it);
+					map.unset(*it);
+					tiles.erase(std::remove(tiles.begin(), tiles.end(), *it), tiles.end());
+					it = candidates.erase(it);
 				} else {
 					++it;
 				}
@@ -162,7 +157,6 @@ election:
 			if (!found) {
 				break;
 			}
-			map.update();
 		}
 	}
 }

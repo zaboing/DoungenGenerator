@@ -1,7 +1,7 @@
 #include "doungen.hpp"
 #include <random>
 #include <iostream>
-#include <time.h>
+#include <ctime>
 
 namespace doungen {
 	
@@ -17,26 +17,14 @@ namespace doungen {
 	}
 
 	void Map::generateRooms(int attempts) {
-		std::uniform_int_distribution<int> xDistribution(0, this->width - 1);
-		std::uniform_int_distribution<int> yDistribution(0, this->height - 1);
+		auto time = clock();
+		std::uniform_int_distribution<int> xDistribution(0, (this->width - 1) / 2);
+		std::uniform_int_distribution<int> yDistribution(0, (this->height - 1) / 2);
 		std::uniform_int_distribution<int> widthDistribution(3, 15);
 		std::uniform_int_distribution<int> heightDistribution(3, 15);
-		char id = 'A';
 		for (int i = 0; i < attempts; i++) {
 			bool intersects = false;
-			std::shared_ptr<Room> room = std::make_shared<Room>(xDistribution(generator), yDistribution(generator), widthDistribution(generator), heightDistribution(generator));
-			if (room->x % 2 == 0) {
-				room->x += 1;
-			}
-			if (room->y % 2 == 0) {
-				room->y += 1;
-			}
-			if (room->width % 2 == 0) {
-				room->width += 1;
-			}
-			if (room->height % 2 == 0) {
-				room->height += 1;
-			}
+			std::shared_ptr<Room> room = std::make_shared<Room>(xDistribution(generator) * 2 + 1, yDistribution(generator) * 2 + 1, widthDistribution(generator) * 2 + 1, heightDistribution(generator) * 2 + 1);
 			if (!isInside(room->x, room->y) || !isInside(room->x + room->width, room->y + room->height)
 				|| !isInside(room->x + room->width, room->y) ||!isInside(room->x, room->y + room->height)) {
 					continue;
@@ -49,13 +37,13 @@ namespace doungen {
 				}
 			}
 			if (!intersects) {
-				room->id = id++;
-				std::cout << room->id << ":" << room->x << "." << room->y << " " << room->width << "x" << room->height << std::endl;
 				//room->shrink(1, 1);
 				regions.push_back(room);
 				set(room->tiles, room);
 			}
 		}
+		time = clock() - time;
+		std::cout << "Generated rooms in " << (((float)time)/CLOCKS_PER_SEC) << " seconds" << std::endl;
 	}
 
 	void Map::generateCorridor(int startX, int startY) {
@@ -67,6 +55,7 @@ namespace doungen {
 	}
 
 	void Map::shrinkCorridors(float accuracy) {
+		auto time = clock();
 		for (auto region : regions) {
 			auto corridor = std::dynamic_pointer_cast<Corridor>(region);
 			if (corridor) {
@@ -74,6 +63,8 @@ namespace doungen {
 				update();
 			}
 		}
+		time = clock() - time;
+		std::cout << "Shrunk corridors in " << (((float)time)/CLOCKS_PER_SEC) << " seconds." << std::endl;
 	}
 
 	void Map::update() {

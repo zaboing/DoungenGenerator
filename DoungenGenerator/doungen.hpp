@@ -6,9 +6,10 @@
 #include <map>
 #include <array>
 #include <random>
+#include <ctime>
 
 namespace doungen {
-    
+
 	class Map;
 
     struct Tile {
@@ -24,7 +25,6 @@ namespace doungen {
 
     class Region {
     public:
-		char id;
         std::vector<Tile> tiles;
         virtual std::vector<Tile> connectors(Map& map) = 0;
 		bool operator ==(Region* region);
