@@ -53,7 +53,9 @@ namespace doungen {
     };
 
 	class Map {
+	private:
 		int width, height;
+		std::shared_ptr<Region> getRegion(Region* region);
 	public:
 		std::shared_ptr<Region>** tileMap;
 		std::default_random_engine generator;
@@ -78,6 +80,12 @@ namespace doungen {
 		void generateCorridor(int startX, int startY);
 		void shrinkCorridors(float accuracy);
 		void update();
+		void unset(std::vector<Tile>& tiles);
+		void unset(Tile& tile);
+		void set(std::vector<Tile>& tiles, Region* region);
+		void set(std::vector<Tile>& tiles, std::shared_ptr<Region> region);
+		void set(Tile& tile, Region* region);
+		void set(Tile& tile, std::shared_ptr<Region> region);
 	};
 }
 

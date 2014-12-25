@@ -49,45 +49,43 @@ namespace doungen {
 	}
 
 	void Corridor::generate(Map& map, std::vector<Tile>& candidates) {
-size_check:
-		if (true/*tiles.size() < 890*/) {
 election:
-			if (candidates.empty()) {
-				return;
-			}
-			std::uniform_int_distribution<int> candidateDistr(0, candidates.size() - 1);
-			int index = candidateDistr(map.generator);
-			
-			std::array<Tile, 4> xNeighbors = candidates[index].getExtendedNeighbors();
-			int empty = 0;
-			for (uint32_t i = 0; i < xNeighbors.size(); i++) {
-				if (!map.getRegion(xNeighbors[i]) && map.isInside(xNeighbors[i])) {
-					empty++;
-				}
-			}
-			if (empty == 0) {
-				candidates.erase(candidates.begin() + index);
-				goto election;
-			}
-
-			carveNext(candidates[index], map);
-
-			Tile added = tiles[tiles.size() - 2];
-			xNeighbors = added.getExtendedNeighbors();
-			empty = 0;
-			for (uint32_t i = 0; i < xNeighbors.size(); i++) {
-				if (!map.getRegion(xNeighbors[i]) && map.isInside(xNeighbors[i])) {
-					empty++;
-				}
-			}
-			if (empty > 0) {
-				candidates.push_back(added);
-			}
-
-			//std::cout << " Candidates: " << candidates.size() << " Tiles " << tiles.size() << std::endl;
-
-			goto size_check;
+		if (candidates.empty()) {
+			return;
 		}
+		std::uniform_int_distribution<int> candidateDistr(0, candidates.size() - 1);
+		int index = candidateDistr(map.generator);
+			
+		std::array<Tile, 4> xNeighbors = candidates[index].getExtendedNeighbors();
+		int empty = 0;
+		for (uint32_t i = 0; i < xNeighbors.size(); i++) {
+			if (!map.getRegion(xNeighbors[i]) && map.isInside(xNeighbors[i])) {
+				empty++;
+			}
+		}
+		if (empty == 0) {
+			candidates.erase(candidates.begin() + index);
+			goto election;
+		}
+
+		carveNext(candidates[index], map);
+
+		Tile added = tiles[tiles.size() - 2];
+		xNeighbors = added.getExtendedNeighbors();
+		empty = 0;
+		for (uint32_t i = 0; i < xNeighbors.size(); i++) {
+			if (!map.getRegion(xNeighbors[i]) && map.isInside(xNeighbors[i])) {
+				empty++;
+			}
+		}
+		if (empty > 0) {
+			candidates.push_back(added);
+		}
+
+		//std::cout << " Candidates: " << candidates.size() << " Tiles " << tiles.size() << std::endl;
+
+		goto election;
+		
 	}
 
 	bool Corridor::isDeadEnd(Tile tile, Map& map) {
@@ -130,7 +128,8 @@ election:
 		int index = directionDistribution(map.generator);
 		tiles.push_back(candidates[index]);
 		tiles.push_back(hops[index]);
-		map.update();
+		map.set(candidates[index], this);
+		map.set(hops[index], this);
 	}
 
 	std::vector<Tile> Corridor::connectors(Map& map) {

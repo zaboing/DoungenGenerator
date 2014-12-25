@@ -19,8 +19,8 @@ namespace doungen {
 	void Map::generateRooms(int attempts) {
 		std::uniform_int_distribution<int> xDistribution(0, this->width - 1);
 		std::uniform_int_distribution<int> yDistribution(0, this->height - 1);
-		std::uniform_int_distribution<int> widthDistribution(8, 15);
-		std::uniform_int_distribution<int> heightDistribution(8, 29);
+		std::uniform_int_distribution<int> widthDistribution(3, 15);
+		std::uniform_int_distribution<int> heightDistribution(3, 15);
 		for (int i = 0; i < attempts; i++) {
 			bool intersects = false;
 			std::shared_ptr<Room> room = std::make_shared<Room>(xDistribution(generator), yDistribution(generator), widthDistribution(generator), heightDistribution(generator));
@@ -36,6 +36,7 @@ namespace doungen {
 			if (room->height % 2 == 0) {
 				room->height += 1;
 			}
+			//std::cout << room->x << "." << room->y << " " << room->width << "x" << room->height << std::endl;
 			room->applyTiles();
 			for (auto region : regions) {
 				if (room->intersects(region)) {
@@ -43,22 +44,18 @@ namespace doungen {
 					break;
 				}
 			}
-			/*if (getRegion(room->x, room->y + room->height) || getRegion(room->x + room->width, room->y) ||
-				getRegion(room->x + room->width, room->y + room->height) || getRegion(room->x, room->y)) {
-					continue;
-			}*/
 			if (!intersects) {
 				//room->shrink(1, 1);
 				regions.push_back(room);
+				set(room->tiles, room);
 			}
 		}
-	
-		update();
 	}
 
 	void Map::generateCorridor(int startX, int startY) {
 		auto corridor = std::make_shared<Corridor>(startX, startY);
 		regions.push_back(corridor);
+		set(corridor->tiles, corridor);
 		corridor->generate(*this);
 		update();
 	}
@@ -85,6 +82,49 @@ namespace doungen {
 					tileMap[tile.x][tile.y] = region;
 				}
 			}
+		}
+	}
+
+	void Map::unset(Tile& tile) {
+		if (isInside(tile)) {
+			tileMap[tile.x][tile.y] = std::shared_ptr<Region>(nullptr);
+		}
+	}
+
+	void Map::unset(std::vector<Tile>& tiles) {
+		for (auto tile : tiles) {
+			unset(tile);
+		}
+	}
+
+	std::shared_ptr<Region> Map::getRegion(Region* region) {
+		if (region != nullptr) {
+			for (auto reg : regions) {
+				if (reg.get() == region) {
+					return reg;
+				}
+			}
+		}
+		return std::shared_ptr<Region>(nullptr);
+	}
+	
+	void Map::set(Tile& tile, Region* region) {
+		set(tile, getRegion(region));
+	}
+
+	void Map::set(Tile& tile, std::shared_ptr<Region> region) {
+		if (isInside(tile)) {
+			tileMap[tile.x][tile.y] = region;
+		}
+	}
+
+	void Map::set(std::vector<Tile>& tiles, Region* region) {
+		set(tiles, getRegion(region));
+	}
+
+	void Map::set(std::vector<Tile>& tiles, std::shared_ptr<Region> region) {
+		for (auto tile : tiles) {
+			set(tile, region);
 		}
 	}
 	

@@ -6,13 +6,16 @@ void print(doungen::Map& map);
 int main(int argc, const char* argv[]) {
 	doungen::Map map(75, 70);
 	map.generateRooms(90);
+	//print(map);
 	map.generateCorridor(1, 1);
+	//print(map);
 	for (auto region : map.regions) {
 		std::shared_ptr<doungen::Room> room = std::dynamic_pointer_cast<doungen::Room>(region);
 		if (room) {
 			room->connectors(map);
 		}
 	}
+	//print(map);
 	map.shrinkCorridors(.4f);
 	print(map);
 	return 0;

@@ -43,8 +43,10 @@ namespace doungen {
 			int amount = amountDistribution(map.generator);
 			for (int i = amount; i > 0; --i) {
 				std::uniform_int_distribution<int> indexDistribution(0, connectors.size() - 1);
-				tiles.push_back(connectors[i]);
-				connectors.erase(connectors.begin() + i);
+				int index = indexDistribution(map.generator);
+				tiles.push_back(connectors[index]);
+				map.set(connectors[index], this);
+				connectors.erase(connectors.begin() + index);
 			}
 		}
 
