@@ -1,7 +1,5 @@
 #include "doungen.hpp"
 
-#include <iostream>
-
 namespace doungen {
 
 	Corridor::Corridor(Tile start) {
@@ -30,14 +28,7 @@ namespace doungen {
 			}
 		}
 
-		auto time = clock();
-
 		generate(map, candidates);
-
-		time = clock() - time;
-
-
-		std::cout << "Generated corridors in " << (((float)time)/CLOCKS_PER_SEC) << " seconds." << std::endl;
 	}
 
 	void Corridor::generate(Map& map, std::vector<Tile>& candidates) {
@@ -140,7 +131,7 @@ election:
 	}
 
 	void Corridor::shrink(float accuracy, Map& map) {
-		int min = (int)(tiles.size() * accuracy);
+		uint32_t min = (int)(tiles.size() * accuracy);
 		std::vector<Tile> candidates(tiles);
 		while (tiles.size() > min) {
 			bool found = false;

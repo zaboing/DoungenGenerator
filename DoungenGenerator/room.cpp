@@ -1,5 +1,4 @@
 #include "doungen.hpp"
-#include <iostream>
 
 namespace doungen {
 	bool isConnector(Room* room, Map& map, int i, int j);

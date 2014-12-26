@@ -1,16 +1,16 @@
 #include "doungen.hpp"
-#include <iostream>
+
 #include <time.h>
 
 void print(doungen::Map& map);
 
 int main(int argc, const char* argv[]) {
 	doungen::Map map(75, 75);
-	map.generator.seed(clock());
+	map.generator.seed(time(nullptr));
 
 	map.generateRooms(90);
 	
-	map.generateCorridor(1, 1);
+	map.generateCorridors();
 
 	for (auto region : map.regions) {
 		std::shared_ptr<doungen::Room> room = std::dynamic_pointer_cast<doungen::Room>(region);

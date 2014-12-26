@@ -1,11 +1,7 @@
 #include "doungen.hpp"
-#include <random>
-#include <iostream>
-#include <ctime>
 
 namespace doungen {
 	
-
 	std::shared_ptr<Region> Map::getRegion(int x, int y) {
 		if (!isInside(x, y)) {
 			return std::shared_ptr<Region>(nullptr);
@@ -39,6 +35,7 @@ namespace doungen {
 			if (!intersects) {
 				//room->shrink(1, 1);
 				regions.push_back(room);
+				room->handle = handle(++sequ);
 				set(room->tiles, room);
 			}
 		}
@@ -46,9 +43,40 @@ namespace doungen {
 		std::cout << "Generated rooms in " << (((float)time)/CLOCKS_PER_SEC) << " seconds" << std::endl;
 	}
 
+	bool Map::shouldGenerateCorridor(int x, int y) {
+		if (getRegion(x, y)) {
+			return false;
+		}
+		std::array<Tile, 4> neighbors = Tile(x, y).getNeighbors();
+		for (uint32_t i = 0; i < neighbors.size(); ++i) {
+			if (getRegion(neighbors[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	void Map::generateCorridors() {
+		auto time = clock();
+
+		for (int i = 1; i < width; i += 2) {
+			for (int j = 1; j < height; j += 2) {
+				if (shouldGenerateCorridor(i, j)) {
+					generateCorridor(i, j);
+				}
+			}
+		}
+
+		time = clock() - time;
+
+
+		std::cout << "Generated corridors in " << (((float)time)/CLOCKS_PER_SEC) << " seconds." << std::endl;
+	}
+
 	void Map::generateCorridor(int startX, int startY) {
 		auto corridor = std::make_shared<Corridor>(startX, startY);
 		regions.push_back(corridor);
+		corridor->handle = handle(++sequ);
 		set(corridor->tiles, corridor);
 		corridor->generate(*this);
 		update();
