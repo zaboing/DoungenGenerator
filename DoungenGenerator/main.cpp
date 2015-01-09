@@ -6,7 +6,7 @@ void print(doungen::Map& map);
 
 int main(int argc, const char* argv[]) {
 	doungen::Map map(75, 75);
-	map.generator.seed(time(nullptr));
+	map.generator.seed((unsigned long)time(nullptr));
 
 	map.generateRooms(90);
 	

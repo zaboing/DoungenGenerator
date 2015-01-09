@@ -35,7 +35,6 @@ namespace doungen {
 			if (!intersects) {
 				//room->shrink(1, 1);
 				regions.push_back(room);
-				room->handle = handle(++sequ);
 				set(room->tiles, room);
 			}
 		}
@@ -76,7 +75,6 @@ namespace doungen {
 	void Map::generateCorridor(int startX, int startY) {
 		auto corridor = std::make_shared<Corridor>(startX, startY);
 		regions.push_back(corridor);
-		corridor->handle = handle(++sequ);
 		set(corridor->tiles, corridor);
 		corridor->generate(*this);
 		update();

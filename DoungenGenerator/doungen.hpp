@@ -1,6 +1,8 @@
 #ifndef DOUNGEN_HPP
 #define	DOUNGEN_HPP
 
+#include <vcclr.h>
+
 #include <vector>
 #include <memory>
 #include <array>
@@ -8,23 +10,14 @@
 #include <ctime>
 #include <iostream>
 
+#using <System.dll>
 
 namespace doungen {
 
 	class Map;
 
-	struct handle {
-	public:
-		int id;
-		handle(int i) : id(i) {}
-		bool operator ==(const handle& h) const {
-			return h.id == id;
-		}
-	};
-
 	struct Tile {
 		int x, y;
-	public:
 		Tile() : x(0), y(0) {}
 		Tile(int xPos, int yPos): x(xPos), y(yPos) {}
 		std::array<Tile, 4> getNeighbors();
@@ -35,8 +28,6 @@ namespace doungen {
 
 	class Region {
 	public:
-		handle handle;
-		Region() : handle(0) {}
 		std::vector<Tile> tiles;
 		virtual std::vector<Tile> connectors(Map& map) = 0;
 		bool operator ==(Region* region);
@@ -66,16 +57,15 @@ namespace doungen {
 	};
 
 	class Map {
-	private:
+	public:
 		int width, height;
-		int sequ;
 		std::shared_ptr<Region> getRegion(Region* region);
 		bool shouldGenerateCorridor(int x, int y);
-	public:
+
 		std::shared_ptr<Region>** tileMap;
 		std::default_random_engine generator;
 		std::vector<std::shared_ptr<Region>> regions;
-		Map(int w, int h) : width(w), height(h), sequ(0) {
+		Map(int w, int h) : width(w), height(h) {
 			tileMap = new std::shared_ptr<Region>*[width];
 			for (int i = 0; i < width; i++) {
 				tileMap[i]= new std::shared_ptr<Region>[height];
@@ -102,6 +92,53 @@ namespace doungen {
 		void set(Tile& tile, Region* region);
 		void set(Tile& tile, std::shared_ptr<Region> region);
 	};
+
+	/*template<typename T, int rank = 1>
+        ref class array : System::Array {};*/
+
+	public ref class MapModifier {
+	public:
+		int seed;
+		int roomAttempts;
+		float shrinkFactor;
+	};
+
+	public ref class ManagedMap {
+		Map* impl;
+	public:
+		ManagedMap(int width, int height) { impl = new Map(width, height); }
+		void generate(MapModifier^ modifier) {
+			impl->generator.seed(modifier->seed);
+			impl->generateRooms(modifier->roomAttempts);
+			impl->generateCorridors();
+			
+			for (auto region : impl->regions) {
+				std::shared_ptr<Room> room = std::dynamic_pointer_cast<Room>(region);
+				if (room) {
+					room->connectors(*impl);
+				}
+			}
+
+			impl->shrinkCorridors(1 - modifier->shrinkFactor);
+		}
+		array<bool, 2>^ getMap() {
+			array<bool, 2>^ map = gcnew array<bool, 2>(impl->width, impl->height);
+
+			for (int i = impl->width - 1; i >= 0; --i) {
+				for (int j = impl->height - 1; j >= 0; --j) {
+					auto region = impl->getRegion(i, j);
+					map[i, j] = region ? true : false;
+				}
+			}
+
+			return map;
+		}
+		~ManagedMap() { delete impl; }
+	protected:
+		!ManagedMap() { delete impl; }
+	};
 }
+
+extern "C" 
 
 #endif	/* DOUNGEN_HPP */

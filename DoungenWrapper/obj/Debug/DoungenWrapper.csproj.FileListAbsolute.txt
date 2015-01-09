@@ -1,0 +1,8 @@
+C:\GitHub\DoungenGenerator\DoungenWrapper\bin\Debug\DoungenWrapper.exe.config
+C:\GitHub\DoungenGenerator\DoungenWrapper\bin\Debug\DoungenWrapper.exe
+C:\GitHub\DoungenGenerator\DoungenWrapper\bin\Debug\DoungenWrapper.pdb
+C:\GitHub\DoungenGenerator\DoungenWrapper\obj\Debug\DoungenWrapper.csprojResolveAssemblyReference.cache
+C:\GitHub\DoungenGenerator\DoungenWrapper\obj\Debug\DoungenWrapper.exe
+C:\GitHub\DoungenGenerator\DoungenWrapper\obj\Debug\DoungenWrapper.pdb
+C:\GitHub\DoungenGenerator\DoungenWrapper\bin\Debug\DoungenGenerator.dll
+C:\GitHub\DoungenGenerator\DoungenWrapper\bin\Debug\DoungenGenerator.pdb
