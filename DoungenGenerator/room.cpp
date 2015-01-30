@@ -82,11 +82,11 @@ namespace doungen {
 		}
 	}
 
-	bool isConnector(Room* room, Map& map, int i, int j) {
-		if (!map.isInside(i, j)) {
+	bool isConnector(Room* room, Map& map, int x, int y) {
+		if (!map.isInside(x, y)) {
 			return false;
 		}
-		Tile tile(i, j);
+		Tile tile(x, y);
 		std::shared_ptr<Region> region = map.getRegion(tile);
 		if (region) {
 			return false;

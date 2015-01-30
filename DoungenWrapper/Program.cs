@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using doungen;
+using Doungen;
 
 namespace DoungenWrapper
 {
@@ -16,7 +16,7 @@ namespace DoungenWrapper
             MapModifier modifier = new MapModifier();
             modifier.seed = 152;
             modifier.roomAttempts = 50;
-            modifier.shrinkFactor = .0f;
+            modifier.shrinkFactor = 1f;
             map.generate(modifier);
             bool[,] tiles = map.getMap();
             for (int i = 0; i < tiles.GetLength(1); i++)
